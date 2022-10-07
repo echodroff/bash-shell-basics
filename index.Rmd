@@ -1,0 +1,377 @@
+---
+title: "Bash Shell Basics"
+date: "2022-10-5"
+author:
+  name: "Eleanor Chodroff"
+  url: "https://www.eleanorchodroff.com/"
+  #orcid:
+  #email:
+  #affiliations:
+    #name:
+    #department:
+format:
+  html: default
+license: "CC-BY-SA 4.0"
+citation: true
+---
+
+## Introduction
+
+In corpus phonetics, the preparation, processing, and analysis of speech data are extensively automated. Use of the command line, or shell, is required for several relevant programs; it also greatly facilitates batch processing of large numbers of files. One of the advantages of corpus phonetics is being able to scale up the size of projects; however, handling large numbers of files individually would be quite tedious. A simple command in the command line can affect all applicable files in one go. Common uses of the command line include moving, renaming, deleting, copying, and creating files.
+
+So what exactly is the command line or the shell?
+
+It is an interface to your computer's operating system. It allows the user to directly "speak" to the computer, and navigate through files and folders. By typing a certain command, the user can interact with and modify files, folders, and properties of the computer. Because of this, it is incredibly powerful -- many avoid it for this reason, but power is also a good thing, especially when it comes to dealing with large numbers of files.
+
+The shell or shells that we'll be using are the built-in system on Macs: the Terminal, and a comparable program for Windows: Cygwin. These shells both use Unix-based commands.
+
+In this part of the tutorial, we'll be learning how to use the command line and specifically doing the following:
+
+* view files and directories (folders)
+* navigate through directories
+* move files
+* copy files
+* rename files
+* safely delete files
+* create files and directories
+
+We'll start off with a brief familiarization, then go further into navigating and manipulating files through the command line. Much of this part of the tutorial is based heavily on the [Software Carpentries](https://swcarpentry.github.io/shell-novice/) course for the Unix Shell, though I've inserted several of my own tips and tricks that I've also found helpful for corpus phonetics work.
+
+## Familiarization
+
+At an abstract level, computers are typically used for a handful of functions including running programs, storing data, and communicating with others. There are several ways in which we can interact with a computer including using a keyboard and mouse, touchscreen, voice command, and so forth. 
+
+Many of these, and especially the keyboard and mouse and touchscreen variants, use what's called a **graphical user interface (GUI)** to interact with the underlying parts of the computer. Breaking apart that term, the display on a Windows or a Mac is simply a visual display of buttons and options that implement commands to the computer when pressed. Companies at least strive to make these interfaces intuitive and easy to interact with (though I'm sure we've all encountered some frustrating ones!). Importantly, using a GUI is still an instance of instructing the computer to do something -- whether that's moving a file or opening a program, or creating a file, and so forth. 
+
+GUIs are great -- easy and intuitive, but they often don't scale very well. While we can sometimes use a select all, copy all sequence, what if we just wanted to select only those files that contained the word "cat" in the filename? Or using a nice example from the Carpentries: "if we have to copy the third line of each of a thousand text files stored in thousand different directories and paste it into a single file line by line." This would be incredibly tedious and time-consuming.
+
+In contrast to the GUI is the **command-line interface**, or the **shell**. The The command-line interface is far less visual, but far more powerful, especially for automating well-defined instructions like those just described. 
+
+For each command entered, the shell reads the command, evaluates and executes it, and prints the output of the command. It then loops back and waits for the next command. This is known as a **read-evalaute-print loop**. 
+
+## Current working directory
+
+When opening the shell, the first thing presented on every line is a **prompt** for input, or the command to be executed. On the Mac terminal, the prompt is a dollar sign, and depending on your settings, the prompt may be preceded by the name of your computer, current location in the computer, and your username.
+
+```{r eval=FALSE}
+$
+  
+# or
+  
+Eleanor$
+  
+# or 
+
+# computer name: location username$
+Eleanors-Macbook-Pro-2:~ Eleanor$
+```
+
+
+When you first open the shell, it immediately "places you" in your home directory. Remember that you can navigate around the directories on your computer from the shell. This is home base. On Macs the home directory is indicated with a tilde. 
+
+So what is the full name of our home directory? We can find this out by having the shell spell out the current directory that we're located in with the command `pwd`, which stands for **print working directory**. 
+
+
+```{r eval=FALSE}
+Eleanors-Macbook-Pro-2:~ Eleanor$ pwd
+/Users/Eleanor
+```
+
+On Windows, this will likely be a location on your `C:\` drive.
+
+This command is useful if you ever need a reminder of where you are in the computer. Any command you write will be executed from this location which will be important to remember as we go along. 
+
+## Listing
+
+The next command we'll try is one of the most frequent commands used: `ls` which **lists** all files and directories in the current working directory. 
+
+```{r eval=FALSE}
+$ ls
+file1   dir1
+file2   dir2
+file3   dir3
+```
+
+Note that if you mistype a command, something bad could happen (`Ctrl-C` is a useful command to remember), or more likely the shell will throw an error indicating that the command was not found:
+
+```{r eval=FALSE}
+$ ks
+
+ks: command not found
+```
+
+There are several options or **flags** you can add to the `ls` command in order to display additional properties about the files and directories. I'll mention just a few useful ones here, but as with most things, you can find a complete list online. 
+
+```{r eval=FALSE}
+# show which are files and which directories
+$ ls -F
+
+# show "long" format of file (additional properties like read-write permissions, owner, size, date of creation, etc.)
+$ ls -l
+
+# make the "long" format a bit more human-readable
+$ ls -lh
+
+# show all files in every sub-directory 
+$ ls -R
+
+# list files based on time last updated
+$ ls -t
+```
+
+**Getting help**
+
+To see the manual for a command, you can use `man`
+```{r eval=FALSE}
+$ man ls
+```
+
+
+## Navigating
+
+A key part of the command line is the ability to navigate through the various directories in the computer. This is analagous to clicking on a directory and then a sub-directory and then maybe hitting the back arrow -- even using the GUI, we're also navigating through different locations in the computer. For this to work well, it helps to think of the computer as a massive tree structure of directories -- there are root directories, parent directories, and so forth. Using the command `cd` you can move up, down, and around on that tree structure. 
+
+Let's say you just want to go to a directory contained in your current working directory. You can use the following:
+```{r eval=FALSE}
+$ cd name-of-directory
+# where the name of the directory is a sub-directory of the current working directory
+```
+
+Let's say you want to change to a completely different location on the computer. You can also type in the **absolute path** to the location starting from your home directory, and this will work from any location on your computer:
+
+```{r eval=FALSE}
+$ cd /Users/Eleanor/Dropbox/
+# where the name of the directory is a sub-directory of the current working directory
+```
+
+Note that the presence or absence of the final / typically does not make a difference for the command. 
+
+Let's say though that we just want to go to the directory above. We can instead use a **relative path** to indicate the location. Note that the first example was also an instance of a relative path. To specify a directory **above**, we use `..`.
+
+```{r eval=FALSE}
+$ cd ..
+```
+
+We can even go two directories above:
+```{r eval=FALSE}
+$ cd ../..
+```
+
+So really, `cd` takes as its argument the **path**, absolute or relative, to the directory you wish to navigate to.
+
+How might we go to a directory called `corpus` that is located one directory above our current working directory?
+
+Answer:
+```{r eval=FALSE}
+$ cd ../corpus
+```
+
+Another useful shortcut is the dash `-` character. Using this character brings you back to the last directory you were in -- sort of like if you hit the back arrow on your internet browser. This function has nothing to do with the relative path, but rather the history of directories that you have visited. 
+
+```{r eval=FALSE}
+$ cd -
+```
+
+Finally, we may not use it today, but another character to be aware of is the single dot `.`. This refers to the current working directory and is typically left unspecified (not written out) in commands. On occasion, it's useful to know of its existence 
+
+```{r eval=FALSE}
+$ cd ./corpus
+```
+
+## Creating directories and files
+
+To create a directory in the command line, you can use the command `mkdir`. This takes one argument, the location and name of the new directory. If the location is in the current working directory, as usual, you can just leave out the full path and type the name of the directory.
+
+```{r eval=FALSE}
+$ mkdir mycorpus
+
+$ mkdir mycorpus/audio
+
+$ mkdir mycorpus/transcripts
+```
+
+Creating files in the command line requires use of a text editor. There are several text editors you can install on the command line, and several come built in, especially on the Terminal. A text editor is like the command line version of Notepad or TextEdit: it's useful for modifying and creating very simple, basic text files. Note that these editors are indeed restricted to text only: no tables, images, media, etc. We'll be using an editor called `vim`.
+
+Let's create a dummy corpus of transcripts so we can practice manipulating and moving files in the command line.
+
+```{r eval=FALSE}
+$ cd mycorpus
+
+# press i to insert
+
+This is the transcript for speaker 1.
+
+# use arrow keys to navigate around. Can also use option+mouse click to move the cursor long distance. (This also works in the Terminal directly!)
+
+# press esc to stop inserting
+
+# press wq to write (save) and quit the file. If you need to exit without saving, press q! to forcibly quit 
+```
+
+Create files for speaker2, speaker3. Maybe we could also just copy a few of these. 
+
+To view a text file, but not edit, you can use one of the following command:
+
+```{r eval=FALSE}
+
+# to show 20 lines at a time
+$ more speaker1.txt
+# hit enter/return to see more
+# q to quit
+
+# to show the full file
+$ cat speaker1.txt
+
+# to see the head of a file
+$ head speaker1.txt
+
+# to see the first three (or whatever number of) lines of a file
+$ head -n 3 speaker1.txt
+
+# to see the tail of a file
+$ tail speaker1.txt
+
+# to see the last three (or whatever number of) lines of a file
+$ tail -n 3 speaker1.txt
+
+```
+## Copying files
+
+To copy a file, the command is `cp` and has two alternative usages: copying a source file to a target file, or copying a set of source files to a target directory.
+
+Copying in sense one involves copying one file and creating a new one with a different name. 
+```{r eval=FALSE}
+$ cp speaker1.txt speaker4.txt
+
+```
+
+Copying in sense two involves copying one or more files and putting the new versions (with the same name) into a different directory: 
+
+```{r eval=FALSE}
+$ mkdir test
+  
+$ cp speaker1.txt speaker2.txt test
+```
+
+We'll now need to modify speaker4.txt:
+
+```{r eval=FALSE}
+$ vi speaker4.txt
+
+This is the transcript for speaker (1)4.
+```
+
+
+We can also copy a directory using the recursive `-r` flag.
+```{r eval=FALSE}
+$ cp -r test test_backup
+
+$ ls test test_backup
+```
+
+## Moving files
+
+Another very powerful part of the command line is moving files. 
+
+```{r eval=FALSE}
+$ mv source-file location/
+
+$ mv speaker1.txt test/
+```
+
+Moving can also very usefully be used to rename files. Effectively, you move one file into the name of another file. 
+
+```{r eval=FALSE}
+$ mv source-file location/target-file
+
+$ mv speaker1.txt speaker1_new.txt
+$ mv speaker1_new.txt ../speaker1.txt
+```
+
+## Batch renaming and for loops
+Because this renaming aspect of mv is so useful, we're going to explore a bit more of what can be done with that. For this part, we'll introduce  regular expressions, for loops, and variables in the shell.
+
+To rename all files in a directory, we can do the following. This is simply a command I use frequently in my own scripting, and I've found it incredibly useful. I'll explain each part once we see it in action:
+
+```{r eval=FALSE}
+$ for i in speaker*.txt; do mv "$i" "${i/.txt/_new.txt}"; done
+
+#alternatively
+$ for i in speaker*.txt
+> do mv "$i" "${i/.txt/_new.txt}"
+> done
+```
+
+for-loop: iteration over files
+for-loop structure
+
+variables: i --> referred to later with $ and quotes for the string
+
+regular expressions and wildcards: very important concept in coding and present in most, if not all programming languages
+A regular expression is a particular set of characters that define a search pattern. Keyword here is pattern. 
+
+The `*` is one of the most common patterns, called the wildcard: match 0 or more characters
++: match one preceding character and any number of characters after
+?: match any one character in that position
+???_speaker: match three characters at the beginning, followed by "_speaker"
+[a-z]
+[A-Z]
+[0-9]
+[2-5]
+[a-zA-Z]
+
+Curly brackets with three slots within them allow for text substitution: the first slot is the item to undergo a substitution process
+second slot is the part to be replaced
+third slot is the replacement
+
+**Safer implementation**
+Be very careful with mv!! If you're not sure, make a backup of files and use `echo` first to print all matches.
+```{r eval=FALSE}
+$ echo speaker*.txt
+  
+$ for i in speaker*.txt; do echo "$i" "${i/.txt/_new.txt}"; done
+
+#alternatively
+$ for i in speaker*.txt
+> do echo "$i" "${i/.txt/_new.txt}"
+> done
+```
+
+## Removing files
+
+Removing files can be very risky and so should be done with the utmost care! When you remove files from the command line, the files do not get sent to the Trash bin. Instead, they are immediately and permanently deleted. It is almost impossible to recover these files, so again, **use with caution**!
+
+```{r eval=FALSE}
+# to remove with a nice prompt for each file! (highly recommended unless you have hundreds of files you're deleting at once)
+$ rm -i speaker1.txt
+
+# this will then ask you:
+remove speaker1.txt? 
+# to which you type either y for yes or n for no
+y
+# remember that it will ask you this question for every single file in the list, so if you do:
+$ rm -i speaker*.txt
+
+# and you have 20 files that match speaker*.txt, you will have to type y 20 times to remove them all
+```
+
+Alternatively, you can run the quicker but riskier version without the `-i` flag.
+```{r eval=FALSE}
+$ rm speaker1.txt
+```
+
+To remove an entire directory, you'll need to use the `-r` flag. This can be combined with the `-i` flag to give you the 'are you sure' warning:
+
+```{r eval=FALSE}
+$ rm -r myDirectory
+
+# or
+$ rm -ri myDirectory
+examine files in directory myDirectory?
+# type y or n: n indicates you want to proceed with deletion
+  # if you type y, then you will see the files and get an extra prompt asking if you want to delete
+  y
+remove myDirectory?
+  y
+```
+
